@@ -1,0 +1,30 @@
+<div class="container-fluid pt-5">
+  <div class="d-flex flex-column text-center mb-5 pt-5">
+    <h1 class="display-4 m-0">Listagem de clientes</h1>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-8 mb-5">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nome do cliente</th>
+            <th>CPF do cliente</th>
+            <th>Limite de crédito</th>
+            <th>Gerente</th>
+            <th>Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cliente of clientes">
+            <th>{{cliente.nome}}</th>
+            <th>{{cliente.cpf}}</th>
+            <th>{{cliente.limite | currency: 'BRL'}}</th>
+            <th>{{cliente.gerente}}</th>
+            <th>{{cliente.saldo | currency: 'BRL'}}</th>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="clientes.length==0">Nenhum cliente cadastrado.</p>
+    </div>
+  </div>
+</div>

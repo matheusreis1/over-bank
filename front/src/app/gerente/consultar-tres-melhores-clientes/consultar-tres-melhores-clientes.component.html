@@ -1,0 +1,37 @@
+<div class="container-fluid pt-5">
+    <div class="d-flex flex-column text-center mb-5 pt-5">
+      <h1 class="display-4 m-0">Consultar os 3 melhores clientes</h1>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 mb-5">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 10%">CPF</th>
+                        <th style="width: 10%">Nome</th>
+                        <th style="width: 10%">Cidade</th>
+                        <th style="width: 10%">Estado</th>
+                        <th style="width: 10%">Saldo</th>
+                        <th style="width: 10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr  *ngFor="let cliente of clientes">
+                        <td> {{cliente.cpf}}</td>
+                        <td> {{cliente.nome}}</td>
+                        <td> {{cliente.cidade}}</td>
+                        <td> {{cliente.estado}}</td>
+                        <td> {{cliente.saldo | currency: 'BRL'}}</td>
+                        <td>
+                            <button type="button" class="btn btn-xs btn-info" (click)="abrirModalCliente(cliente)">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="clientes.length==0">Nenhum cliente cadastrado.</p>
+        </div>
+    </div>
+</div>

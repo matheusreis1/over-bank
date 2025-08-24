@@ -1,0 +1,190 @@
+version: '3.2'
+
+services:
+  api-gateway:
+    build: ./API-Gateway
+    restart: always
+    ports:
+     - "3000:3000"
+    volumes:
+     - ./API-Gateway:/app
+    networks:
+     - bantads_network
+
+  auth-service:
+    build: ./back/auth-service
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service-db
+    environment:
+      - MONGODB_HOST=auth-service-db
+    volumes:
+      - ./back/auth-service:/app
+    networks:
+      - bantads_network
+
+  auth-service-db:
+    image: mongo:latest
+    container_name: auth-service-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./auth-service-db:/data/db
+    networks:
+      - bantads_network
+
+  contas-service-db:
+    image: postgres:latest
+    container_name: contas-service-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: contas_service_db
+      POSTGRES_PASSWORD: contas_service_db
+      POSTGRES_DB: contas_service_db
+    volumes:
+      - ./contas-service-db:/var/lib/postgresql/data
+      - ./config/contas-service-database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bantads_network
+
+  contas-service:
+    build: ./back/contas-service
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - contas-service-db
+    environment:
+      - JDBC_DATABASE_URL=jdbc:postgresql://contas-service-db:5432/contas_service_db
+      - RABBIT_MQ_HOST=rabbitmq
+    volumes:
+      - ./back/contas-service:/app
+    networks:
+      - bantads_network
+
+  gerente-service-db:
+    image: postgres:latest
+    container_name: gerente-service-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: gerente_service_db
+      POSTGRES_PASSWORD: gerente_service_db
+      POSTGRES_DB: gerente_service_db
+    volumes:
+      - ./gerente-service-db:/var/lib/postgresql/data
+    networks:
+      - bantads_network
+
+  gerente-service:
+    build: ./back/crud-gerente
+    restart: always
+    ports:
+      - "8082:3100"
+    depends_on:
+      - gerente-service-db
+    volumes:
+      - ./back/crud-gerente:/app
+    networks:
+      - bantads_network
+
+  cliente-service-db:
+    image: postgres:latest
+    container_name: cliente-service-db
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: cliente_service_db
+      POSTGRES_PASSWORD: cliente_service_db
+      POSTGRES_DB: cliente_service_db
+    volumes:
+      - ./cliente-service-db:/var/lib/postgresql/data
+    networks:
+      - bantads_network
+
+  cliente-service:
+    build: ./back/consultar-clientes
+    restart: always
+    ports:
+      - "8084:3300"
+    depends_on:
+      - cliente-service-db
+    volumes:
+      - ./back/consultar-clientes:/app
+    networks:
+      - bantads_network
+
+  saga-inserir-gerente:
+    build: ./SAGAs/inserir_gerente
+    restart: always
+    ports:
+      - "8083:3200"
+    volumes:
+      - ./SAGAs/inserir_gerente:/app
+    networks:
+      - bantads_network
+
+
+  saga-autocadastro:
+    build: ./SAGAs/autocadastro
+    restart: always
+    ports:
+      - "8085:4000"
+    volumes:
+      - ./SAGAs/autocadastro:/app
+    networks:
+      - bantads_network
+
+  saga-remover-gerente:
+    build: ./SAGAs/remover_gerente
+    restart: always
+    ports:
+      - "8086:3200"
+    volumes:
+      - ./SAGAs/remover_gerente:/app
+    networks:
+      - bantads_network
+
+  send-email:
+    build: ./email
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./email:/app
+    networks:
+      - bantads_network
+
+  rabbitmq:
+    image: rabbitmq:3.13-rc-management 
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+      - type: bind
+        source: ./config/rabbitmq/plugins
+        target: /etc/rabbitmq/enabled_plugins
+      - type: bind
+        source: ./config/rabbitmq/setup.conf
+        target: /etc/rabbitmq/rabbitmq.conf
+      - type: bind
+        source: ./config/rabbitmq/definitions.json
+        target: /etc/rabbitmq/definitions.json
+    networks:
+      - bantads_network
+
+networks:
+  bantads_network:
+    driver: bridge
