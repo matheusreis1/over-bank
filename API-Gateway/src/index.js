@@ -34,9 +34,8 @@ var clientesAPI = 'http://cliente-service:3300';
 
 function verifyJWT(req, res, next) {
     const token = req.headers['x-access-token'];
-    
-        next();
-    
+
+    next();
 }
 
 // auth-service
@@ -113,7 +112,7 @@ app.get('/clientes/:id', verifyJWT, async (req, res, next) => {
                 salario: clienteData.salario
             });
         } else {
-            const {data: contasData} = await axios.get(`${contasAPI}/contas/top3?`+new URLSearchParams(req.query).toString());
+            const { data: contasData } = await axios.get(`${contasAPI}/contas/top3?`+new URLSearchParams(req.query).toString());
             const clientesPromises = contasData.map(async (conta) => {
                 const { data: clienteData } = await axios.get(`${clientesAPI}/clientes/${conta.clienteCpf}`);
                 return clienteData;
@@ -214,7 +213,6 @@ app.post('/gerentes/inserir', verifyJWT, (req, res, next) => {
 app.delete('/gerentes/:id', verifyJWT, (req, res, next) => {
     gerentesDeleteServiceProxy(req, res, next);
 })
-
 
 // Cria o servidor na porta 3000
 var server = http.createServer(app);
