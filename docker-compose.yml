@@ -2,12 +2,12 @@ version: '3.2'
 
 services:
   api-gateway:
-    build: ./API-Gateway
+    build: ./api-gateway
     restart: always
     ports:
      - "3000:3000"
     volumes:
-     - ./API-Gateway:/app
+     - ./api-gateway:/app
     networks:
      - bantads_network
 

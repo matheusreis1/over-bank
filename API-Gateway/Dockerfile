@@ -1,7 +1,12 @@
-FROM node:16.20.2
+FROM oven/bun
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm install http express morgan helmet express-http-proxy cookie-parser body-parser jsonwebtoken dotenv-safe
-COPY --chown=node:node . .
+
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+COPY . .
+
 EXPOSE 3000
-CMD [ "node", "index.js" ]
+
+CMD [ "bun", "start" ]
