@@ -2,7 +2,7 @@
   "name": "api-gateway",
   "version": "0.0.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js"
   },
   "private": true,
   "dependencies": {
